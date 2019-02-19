@@ -16,7 +16,10 @@ public class Board {
 	enum Piece {
 		ROBOT, EMPTY;
 	}
-
+	public static void main(String[] args) {
+	 	Board board = new Board();
+	 	board.PrintBoard();
+	}
 	/**
 	* Constructs an 8x8 Board, it consists of 63 empty pieces, and 1
 	* randomly assigned robot piece.
@@ -123,27 +126,72 @@ public class Board {
 		String result;
 		String columnString;
 		switch(column) {
-			case 0: columnString = "A";
-			case 1: columnString = "B";
-			case 2: columnString = "C";
-			case 3: columnString = "D";
-			case 4: columnString = "E";
-			case 5: columnString = "F";
-			case 6: columnString = "G";
-			case 7: columnString = "H";
+			case 0: 
+			columnString = "A";
+			break;
+
+			case 1: 
+			columnString = "B";
+			break;
+
+			case 2: 
+			columnString = "C";
+			break;
+
+			case 3: 
+			columnString = "D";
+			break;
+			case 4: 
+			columnString = "E";
+			break;
+			case 5: 
+			columnString = "F";
+			break;
+			case 6: 
+			columnString = "G";
+			break;
+			case 7: 
+			columnString = "H";
+			break;
 			default : columnString = "-";
 		}
 		String rowString;
 		switch(row) {
-			case 0: rowString = "1";
-			case 1: rowString = "2";
-			case 2: rowString = "3";
-			case 3: rowString = "4";
-			case 4: rowString = "5";
-			case 5: rowString = "6";
-			case 6: rowString = "7";
-			case 7: rowString = "8";
-			default : rowString = "-";
+			case 0: 
+			rowString = "1";
+			break;
+
+			case 1: 
+			rowString = "2";
+			break;
+
+			case 2: 
+			rowString = "3";
+			break;
+
+			case 3: 
+			rowString = "4";
+			break;
+
+			case 4: 
+			rowString = "5";
+			break;
+
+			case 5: 
+			rowString = "6";
+			break;
+
+			case 6: 
+			rowString = "7";
+			break;
+
+			case 7: 
+			rowString = "8";
+			break;
+
+			default : 
+			rowString = "-";
+			break;
 		}
 		return columnString + rowString;
 	}
@@ -261,4 +309,56 @@ public class Board {
 	private boolean isBelow2(int tile1, int tile2) {
 		return tile1/BOARDSIZE - tile2/BOARDSIZE == 2;
 	}
+
+	public void PrintBoard() {
+		for (int i = 56; i >= 0; i = i - 8) {
+			switch (i) {
+				case 56:
+				System.out.print("8 ");
+				break;
+
+				case 48: 
+				System.out.print("7 ");
+				break;
+
+				case 40: 
+				System.out.print("6 ");
+				break;
+
+		    	case 32: 
+		    	System.out.print("5 ");
+		    	break;
+
+		    	case 24: 
+		    	System.out.print("4 ");
+		    	break;
+
+		    	case 16: 
+		    	System.out.print("3 ");
+		    	break;
+		    	case 8: 
+		    	System.out.print("2 ");
+		    	break;
+
+		    	case 0: 
+		    	System.out.print("1 ");
+		    	break;
+	    	}
+			for (int j = 0; j < 8; j++) {
+				Piece color = board[i + j];
+				switch (color) {
+				case ROBOT:
+					System.out.print("R");
+					break;
+				case EMPTY:
+					System.out.print("-");
+					break;
+				}
+				System.out.print(" ");
+			}
+			System.out.println("");
+		}
+		System.out.println("  A B C D E F G H");
+	}
+
 }
