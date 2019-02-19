@@ -49,7 +49,7 @@ public class robot implements Board {
         public void move_robot () {
             int counter = 0;
             while (loop) {
-                if (isEdge) {
+                if (isEdge(position)) {
                     new_heading = change_direction[rnd.nextInt(change_direction.length)];
                     while (heading == new_heading) {
                         new_heading = change_direction[rnd.nextInt(change_direction.length)];
