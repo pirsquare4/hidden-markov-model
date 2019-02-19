@@ -262,3 +262,13 @@ public class Board {
 		return tile1/BOARDSIZE - tile2/BOARDSIZE == 2;
 	}
 }
+
+	public static int[] removeElem(int[] elems, int remove) {
+		int[] new_array = []
+		for elem : elems {
+			if (elem != remove) {
+				new_array.append(elem);
+			}
+		}
+		return new_array;
+	}
