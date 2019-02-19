@@ -56,7 +56,7 @@ public class robot implements Board {
                     }
                     heading = new_heading;
                 } else if (--isCorner--) {
-                    
+
                 }
                 position += step_in_heading(new_heading);
                 counter++;
