@@ -5,7 +5,7 @@ import java.lang.*;
 * Board Simulator Object
 * Class for the board structure, simulates the board and moves the robot around the board
 * when told to do so.
-* @author: Giordano Bonora Groome
+* @author: Giordano Bonora Groome & Ben Chu
 */
 public class Board {
 
@@ -335,6 +335,7 @@ public class Board {
 		    	case 16: 
 		    	System.out.print("3 ");
 		    	break;
+		    	
 		    	case 8: 
 		    	System.out.print("2 ");
 		    	break;
