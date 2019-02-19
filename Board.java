@@ -261,5 +261,4 @@ public class Board {
 	private boolean isBelow2(int tile1, int tile2) {
 		return tile1/BOARDSIZE - tile2/BOARDSIZE == 2;
 	}
-
 }
