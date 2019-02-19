@@ -46,40 +46,17 @@ public class robot {
         }
     }
 
-    // Robot moves 10 rounds
+    // Robot moves 1 round
     public int move_robot() {
-        int counter = 0;
-        while (loop) {
-            if (isCorner(position)) {
-                if (position == 0) {
-                    int[] cornerone = {0, 1};
-                    heading = cornerone[rnd.nextInt(2)];
-                } else if (position == 7) {
-                    int[] cornertwo = {0, 3};
-                    heading = cornertwo[rnd.nextInt(2)];
-                } else if (position == 56) {
-                    int[] cornerthree = {1, 2};
-                    heading = cornerthree[rnd.nextInt(2)];
-                } else {
-                    int[] cornerfour = {2, 3};
-                    heading = cornerfour[rnd.nextInt(2)];
-                }
-            } else if (isEdge(position) || rnd.nextInt(100) < 30) {
-                new_heading = change_direction[rnd.nextInt(change_direction.length)];
-                while (heading == new_heading) {
-                    new_heading = change_direction[rnd.nextInt(change_direction.length)];
-                }
-                heading = new_heading;
-            }
-            position += step_in_heading(heading);
-            System.out.println(position);
-            System.out.println(heading);
-            counter++;
-            if (counter > 9) {
-                loop = false;
-            }
-            return heading;
+        int[] newHeadings = Board.validHeadings(position);
+        if (Board.willHitWall(heading, position) || rnd.nextInt(100) < 30) {
+            heading = newHeadings[rnd.nextInt(newHeadings.length)];
         }
+        position += step_in_heading(heading);
+        System.out.println(position);
+        System.out.println(heading);
+        return heading;
+
     }
 
     public boolean loop = true;
