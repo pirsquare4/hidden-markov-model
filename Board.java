@@ -158,7 +158,7 @@ public class Board {
 	/**
 	* Returns if TRUE if the integer POSITION is an edge on the board, else false.
 	*/
-	public boolean isEdge(int position) {
+	public static boolean isEdge(int position) {
 		if (position > 63 || position < 0) {
 			return false;
 		}
