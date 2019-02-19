@@ -1,3 +1,0 @@
-Place Position {
-  h0
-}
