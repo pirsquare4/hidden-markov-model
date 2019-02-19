@@ -212,7 +212,6 @@ public class Board {
 		}
 		return position <= 7 || position >= 56 ||
 		 position % BOARDSIZE == 0 || position % BOARDSIZE == 7;
-
 	}
 
 	/**
