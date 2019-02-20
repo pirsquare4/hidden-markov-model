@@ -36,7 +36,7 @@ public class Board {
 	}
 
 	/** 
-	* Returns a random number (Taken from StackOverflow) 
+	* Returns a random number min<=x<=max (Taken from StackOverflow) 
 	*/
 	private static int getRandomNumberInRange(int min, int max) {
 		if (min >= max) {
@@ -79,7 +79,7 @@ public class Board {
 	*/
 	public static String getStringPosition(int position) {
 		if (position < 0 || position > 63) {
-			return "";
+			return "null";
 		}
 		int row = position/BOARDSIZE;
 		int column = position % BOARDSIZE;
@@ -168,11 +168,11 @@ public class Board {
 		}
 		int movement = 0;
 		if (heading == 0) {
-			movement = 8;
+			movement = BOARDSIZE;
 		} else if (heading == 1) {
 			movement = 1;
 		} else if (heading == 2) {
-			movement = -8;
+			movement = BOARDSIZE * -1;
 		} else if (heading == 3) {
 			movement = -1;
 		}
@@ -196,12 +196,13 @@ public class Board {
 	* Returns if TRUE if the integer POSITION is an edge on the board, else false.
 	*/
 	public static boolean isEdge(int position) {
-		if (position > 63 || position < 0) {
-			return false;
-		}
-		return position <= 7 || position >= 56 ||
+		if (position > BOARDSIZE * BOARDSIZE - 1 || position < 0) {
+			return false; //out of bounds
+		}	
+					/*A1 - A8*/		 			/*H1 - H8*/
+		return position <= BOARDSIZE - 1 || position >= BOARDSIZE * (BOARDSIZE - 1) ||
 		 position % BOARDSIZE == 0 || position % BOARDSIZE == 7;
-	}
+	}		/*A1 - H1*/						/*A8 - H8*/
 
 	/**
 	* Returns if the string positions TILE1 and TILE2 are adjacent on the board.
@@ -353,7 +354,14 @@ public class Board {
 		System.out.println("  A B C D E F G H");
 	}
 
-		/** 
+	/** 
+	* Returns the ROBOTPOSITION on the board.
+	*/
+	public int getRobotPosition() {
+		return robotPosition;
+	}
+
+	/** 
 	* Returns the value of what is at POSITION on the board.
 	*/
 	public Piece get(String position) {
@@ -406,12 +414,16 @@ public class Board {
 	}
 
 	public static boolean contains(int[] arr, int targetValue) {
-    for (int s: arr) {
-        if (s == targetValue) {
-            return true;
-        }
+	    for (int s: arr) {
+	        if (s == targetValue) {
+	            return true;
+	        }
+	    }
+	    return false;
+	}
+
+    public int getBoardSize() {
+    	return BOARDSIZE;
     }
-    return false;
-}
 
 }
