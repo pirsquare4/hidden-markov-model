@@ -9,6 +9,7 @@ public class DummyLocalizer implements EstimatorInterface {
 	private Board board;
 	private Sensor sensor;
 	private int currentScan;
+	public double[][] myProbs;
 
 	public DummyLocalizer( int rows, int cols, int head) {
 		this.rows = rows;
@@ -18,6 +19,7 @@ public class DummyLocalizer implements EstimatorInterface {
 		board = new Board(myRobot.position);
 		sensor = new Sensor();
 		currentScan = sensor.scan(board);
+		myProbs = new double[this.rows*this.cols*4][this.rows*this.cols*4];
 
 	}
 	
@@ -62,7 +64,7 @@ public class DummyLocalizer implements EstimatorInterface {
 
 
 	public double getCurrentProb( int x, int y) {
-		double ret = 0.0;
+		double ret = 1/64;
 		return ret;
 	}
 

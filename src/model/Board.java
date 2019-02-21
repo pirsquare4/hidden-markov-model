@@ -12,7 +12,7 @@ import java.lang.*;
 public class Board {
 
 	Piece[] board;
-	public int robotPosition;
+	public int position;
 	public static int BOARDSIZE = 8;
 
 	/* Piece types */
@@ -33,8 +33,8 @@ public class Board {
 		for (int i = 0; i < 64; i++) {
 			board[i] = Piece.EMPTY;
 		}
-		robotPosition = pos;
-		board[robotPosition] = Piece.ROBOT;
+		position = pos;
+		board[position] = Piece.ROBOT;
 	}
 
 	/** 
@@ -178,10 +178,10 @@ public class Board {
 		} else if (heading == 3) {
 			movement = -1;
 		}
-		if (isAdjacent(robotPosition, robotPosition + movement)) {
-			board[robotPosition] = Piece.EMPTY;
-			robotPosition += movement;
-			board[robotPosition] = Piece.ROBOT;
+		if (isAdjacent(position, position + movement)) {
+			board[position] = Piece.EMPTY;
+			position += movement;
+			board[position] = Piece.ROBOT;
 		} else {
 			throw new IllegalArgumentException("This movement would cause the robot to hit a wall");
 		}
@@ -254,14 +254,24 @@ public class Board {
 			return false;
 		} else if  (tile1 < 0 || tile2 < 0) {
 			return false;
-		} else if ((tile1 % BOARDSIZE == tile2 % BOARDSIZE - 2) ||
+		} else if ((tile1 % BOARDSIZE == tile2 % BOARDSIZE + 2) ||
 			(tile1 % BOARDSIZE == tile2 % BOARDSIZE) ||
 			(tile1 % BOARDSIZE == tile2 % BOARDSIZE - 2)) {
 			if (isAbove2(tile1,tile2) || isSame(tile1, tile2) || isBelow2(tile1,tile2)) {
-				return true; /* is Two above, two below, or on the same line, and two
-								to the left, two to the right or the the same row.
-								Note: Dealt with edge case tile1 = tile2 */
+				return true;
 			}
+				/*top left, top middle, top right, middle left, middle right, bottom left, bottom right, bottom middle
+				 * 8/16 cases */
+		} else if ((tile1 % BOARDSIZE == tile2 % BOARDSIZE - 1) ||
+				(tile1 % BOARDSIZE == tile2 % BOARDSIZE + 1)) {
+			return (isAbove2(tile1,tile2) || isBelow2(tile1,tile2));
+				/*top middle-left, top middle-right, bottom middle-left, bottom middle-right
+				 * 4/16 cases */
+		}
+
+		if ((tile1 % BOARDSIZE == tile2 % BOARDSIZE + 2) || (tile1 % BOARDSIZE == tile2 % BOARDSIZE - 2)) {
+			return isAbove(tile1, tile2) || isBelow(tile1, tile2);
+				/*other 4 cases */
 		}
 		return false;
 	}
@@ -360,7 +370,7 @@ public class Board {
 	* Returns the ROBOTPOSITION on the board.
 	*/
 	public int getRobotPosition() {
-		return robotPosition;
+		return position;
 	}
 
 	/** 
@@ -448,8 +458,8 @@ public class Board {
 	public int[] getXY(robot myRobot) {
 		int[] result = new int[3];
 		int currentPosition = this.getRobotPosition();
-		int X = robotPosition % 8;
-		int Y = robotPosition / 8;
+		int X = position % 8;
+		int Y = position / 8;
 		int H = myRobot.heading;
 		result[0] = Y;
 		result[1] = X;
@@ -486,5 +496,34 @@ public class Board {
 		} else {
 			return headings;
 		}
+	}
+
+	public static double GioTest(int position) {
+		int nLn1 = 0;
+		int nLn2 = 0;
+		int size = 8;
+		int[] possibleLn2s = {
+				size*2 - 2, size*2 - 1, size *2, size*2 + 1, size * 2 + 2,
+				size - 2, size + 2,
+				-2, 2,
+				size*-1 - 2, size*-1 + 2,
+				size*-2 - 2, size*-2 - 1, size*-2, size*-2 + 1, size*-2 + 2};
+		int[] possibleLn1s = {size - 1, size, size + 1,
+				-1, 1,
+				size*-1 - 1, size*-1, size*-1 + +1 };
+		for (int possibleLn2: possibleLn2s) {
+			if (Board.isAdjacent2(position, position + possibleLn2)) {
+				nLn2 += 1;
+			}
+		}
+		for (int possibleLn1: possibleLn1s) {
+			if (Board.isAdjacent(position, position + possibleLn1)) {
+				nLn1 += 1;
+			}
+		}
+		System.out.print("nLn2 is: ");
+		System.out.println(nLn2);
+		double chanceOfNothing = 1000 - 100 - nLn1* 50 - nLn2*25;
+		return chanceOfNothing;
 	}
 }
