@@ -1,3 +1,5 @@
+package model;
+
 import java.util.*;
 import java.lang.*;
 
@@ -425,5 +427,17 @@ public class Board {
     public int getBoardSize() {
     	return BOARDSIZE;
     }
+
+    public int[] getXY(robot myRobot) {
+		int[] result = new int[3];
+		int currentPosition = this.getRobotPosition();
+		int X = robotPosition % 8;
+		int Y = robotPosition / 8;
+		int H = myRobot.heading;
+		result[0] = X;
+		result[1] = Y;
+		result[2] = H;
+		return result;
+	}
 
 }

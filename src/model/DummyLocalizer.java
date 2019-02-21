@@ -8,6 +8,7 @@ public class DummyLocalizer implements EstimatorInterface {
 	private robot myRobot;
 	private Board board;
 	private Sensor sensor;
+	private int currentScan;
 
 	public DummyLocalizer( int rows, int cols, int head) {
 		this.rows = rows;
@@ -15,7 +16,8 @@ public class DummyLocalizer implements EstimatorInterface {
 		this.head = head;
 		myRobot = new robot();
 		board = new Board(myRobot.position);
-		sensor = new Sensor;
+		sensor = new Sensor();
+		currentScan = sensor.scan(board);
 
 	}
 	
@@ -41,18 +43,17 @@ public class DummyLocalizer implements EstimatorInterface {
 
 
 	public int[] getCurrentTrueState() {
-		
-		int[] ret = new int[3];
-		ret[0] = rows/2;
-		ret[1] = cols/2;
-		ret[2] = head;
+		int[] ret = board.getXY(myRobot);
 		return ret;
-
 	}
 
 	public int[] getCurrentReading() {
-		int[] ret = null;
-		return ret;
+		int[] result = new int[2];
+		int X = currentScan % 8;
+		int Y = currentScan / 8;
+		result[0] = X;
+		result[1] = Y;
+		return result;
 	}
 
 
@@ -64,6 +65,8 @@ public class DummyLocalizer implements EstimatorInterface {
 	public void update() {
 		int new_heading = myRobot.move_robot();
 		board.move(new_heading);
+		currentScan = sensor.scan(board);
+
 	}
 
 

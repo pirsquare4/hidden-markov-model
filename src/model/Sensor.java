@@ -1,3 +1,4 @@
+package model;
 import java.util.*;
 
 class Sensor {
@@ -56,5 +57,14 @@ class Sensor {
 
 
 
+	}
+
+	public int[] scanTranslate(int scanPos) {
+		int[] result = new int[2];
+		int X = scanPos % 8;
+		int Y = scanPos / 8;
+		result[0] = X;
+		result[1] = Y;
+		return result;
 	}
 }

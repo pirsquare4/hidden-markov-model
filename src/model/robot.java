@@ -1,3 +1,5 @@
+package model;
+
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.*;
 
