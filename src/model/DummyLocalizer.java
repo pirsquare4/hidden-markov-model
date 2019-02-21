@@ -44,15 +44,19 @@ public class DummyLocalizer implements EstimatorInterface {
 
 	public int[] getCurrentTrueState() {
 		int[] ret = board.getXY(myRobot);
+		ret[2] = board.translateDirection(ret[2]);
 		return ret;
 	}
 
 	public int[] getCurrentReading() {
+		if (currentScan == -1) {
+			return null;
+		}
 		int[] result = new int[2];
 		int X = currentScan % 8;
 		int Y = currentScan / 8;
-		result[0] = X;
-		result[1] = Y;
+		result[0] = Y;
+		result[1] = X;
 		return result;
 	}
 

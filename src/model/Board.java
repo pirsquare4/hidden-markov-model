@@ -434,10 +434,19 @@ public class Board {
 		int X = robotPosition % 8;
 		int Y = robotPosition / 8;
 		int H = myRobot.heading;
-		result[0] = X;
-		result[1] = Y;
+		result[0] = Y;
+		result[1] = X;
 		result[2] = H;
 		return result;
 	}
 
+	public int translateDirection(int direction) {
+		if (direction == 0) {
+			return 2;
+		} else if (direction == 2) {
+			return 0;
+		} else {
+			return direction;
+		}
+	}
 }
