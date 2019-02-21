@@ -69,7 +69,8 @@ public class DummyLocalizer implements EstimatorInterface {
 
 
 	public double getCurrentProb( int x, int y) {
-		return this.transitionMatrix[x][y] + this.transitionMatrix[x][y+1] + this.transitionMatrix[x][y+2] + this.transitionMatrix[x][y+3];
+		int IntForm = Board.XYtoInt(x, y);
+		transitionMatrix
 	}
 
 	public void update() {

@@ -474,13 +474,17 @@ public class Board {
 	public int[] getXY(robot myRobot) {
 		int[] result = new int[3];
 		int currentPosition = this.getRobotPosition();
-		int X = position % 8;
-		int Y = position / 8;
+		int Y = position % 8;
+		int X = position / 8;
 		int H = myRobot.heading;
-		result[0] = Y;
-		result[1] = X;
+		result[0] = X;
+		result[1] = Y;
 		result[2] = H;
 		return result;
+	}
+
+	public static int XYtoInt(int x, int y) {
+		return arr[0] * 8 + arr[1];
 	}
 
 	/**
