@@ -391,6 +391,12 @@ public class Board {
 		}
 	}
 
+	/**
+	 *
+	 * @param tile is a tile on the board (0<=tile<=63)
+	 * @return the valid directions that the robot could go
+	 * given a spot on the board.
+	 */
 	public static int[] validHeadings(int tile) {
 		ArrayList<Integer> valid = new ArrayList<Integer>();
 		if (isAdjacent(tile, tile + 8)) {
@@ -415,6 +421,9 @@ public class Board {
 		return arr;
 	}
 
+	/**
+	 * Returns true if ARR contains the value TARGETVALUE
+	 */
 	public static boolean contains(int[] arr, int targetValue) {
 	    for (int s: arr) {
 	        if (s == targetValue) {
@@ -424,11 +433,19 @@ public class Board {
 	    return false;
 	}
 
+	/**
+	 *
+	 * @return BOARDSIZE
+	 */
     public int getBoardSize() {
     	return BOARDSIZE;
     }
 
-    public int[] getXY(robot myRobot) {
+	/**
+	 * Returns the location of MYROBOT in an X,Y pair. X being the row
+	 * Y being the column
+	 */
+	public int[] getXY(robot myRobot) {
 		int[] result = new int[3];
 		int currentPosition = this.getRobotPosition();
 		int X = robotPosition % 8;
@@ -440,6 +457,11 @@ public class Board {
 		return result;
 	}
 
+	/**
+	 * Translates the direction (heading) from the Board heading to the
+	 * given Interface GUI heading. West and East remain the same, but North => South
+	 * and South => North in from our model to the given GUI model.
+	 */
 	public int translateDirection(int direction) {
 		if (direction == 0) {
 			return 2;
@@ -447,6 +469,22 @@ public class Board {
 			return 0;
 		} else {
 			return direction;
+		}
+	}
+
+	public static int[] removeCurrentDirection(int[] headings, int heading) {
+		if (contains(headings, heading)) {
+			int[] newHeadings = new int[headings.length - 1];
+			int i = 0;
+			for (int head: headings) {
+				if (head != heading) {
+					newHeadings[i] = head;
+					i++;
+				}
+			}
+			return newHeadings;
+		} else {
+			return headings;
 		}
 	}
 }

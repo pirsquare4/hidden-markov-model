@@ -50,10 +50,15 @@ public class robot {
 
     // Robot moves 1 round
     public int move_robot() {
-        int[] newHeadings = Board.validHeadings(position);
-        if (Board.willHitWall(heading, position) || rnd.nextInt(100) < 30) {
+        int a = rnd.nextInt(100);
+        if (Board.willHitWall(heading, position) || a < 30) {
+            int[] newHeadings = Board.validHeadings(position);
+            if (a < 30) {
+                newHeadings = Board.removeCurrentDirection(newHeadings, heading);
+            }
             heading = newHeadings[rnd.nextInt(newHeadings.length)];
         }
+
         position += step_in_heading(heading);
         System.out.println(position);
         System.out.println(heading);
