@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="bafd7e62-1bc8-4ef3-bed9-efa885f33343" name="Default Changelist" comment="ColorBlind Friendly, and fixed a bug with heading.">
-      <change beforePath="$PROJECT_DIR$/src/model/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Board.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/model/DummyLocalizer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/DummyLocalizer.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/bin/" />
@@ -52,8 +51,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/model/DummyLocalizer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="155">
-              <caret line="72" column="24" selection-start-line="72" selection-start-column="24" selection-end-line="72" selection-end-column="24" />
+            <state relative-caret-position="289">
+              <caret line="71" column="42" selection-start-line="71" selection-start-column="42" selection-end-line="71" selection-end-column="42" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#847#848#0" expanded="true" />
@@ -61,6 +60,8 @@
                 <element signature="e#941#942#0" expanded="true" />
                 <element signature="e#1032#1033#0" expanded="true" />
                 <element signature="e#1113#1114#0" expanded="true" />
+                <element signature="e#1521#1522#0" expanded="true" />
+                <element signature="e#1561#1562#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -154,9 +155,9 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="403" />
-    <option name="y" value="472" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="128" />
+    <option name="y" value="-18" />
     <option name="width" value="1568" />
     <option name="height" value="790" />
   </component>
@@ -204,7 +205,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550781073185" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550785710434" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
@@ -263,10 +264,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="323" y="378" width="1254" height="632" extended-state="0" />
+    <frame x="-7" y="-7" width="1550" height="878" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.30904523" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24765101" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -276,7 +277,7 @@
       <window_info id="Favorites" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.582" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.39008042" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -409,8 +410,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/model/DummyLocalizer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="155">
-          <caret line="72" column="24" selection-start-line="72" selection-start-column="24" selection-end-line="72" selection-end-column="24" />
+        <state relative-caret-position="289">
+          <caret line="71" column="42" selection-start-line="71" selection-start-column="42" selection-end-line="71" selection-end-column="42" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#847#848#0" expanded="true" />
@@ -418,6 +419,8 @@
             <element signature="e#941#942#0" expanded="true" />
             <element signature="e#1032#1033#0" expanded="true" />
             <element signature="e#1113#1114#0" expanded="true" />
+            <element signature="e#1521#1522#0" expanded="true" />
+            <element signature="e#1561#1562#0" expanded="true" />
           </folding>
         </state>
       </provider>
