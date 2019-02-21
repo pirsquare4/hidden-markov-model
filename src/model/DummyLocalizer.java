@@ -70,6 +70,7 @@ public class DummyLocalizer implements EstimatorInterface {
 
 	public double getCurrentProb( int x, int y) {
 		int IntForm = Board.XYtoInt(x, y);
+		return 0.0;
 	}
 
 	public void update() {

@@ -484,7 +484,7 @@ public class Board {
 	}
 
 	public static int XYtoInt(int x, int y) {
-		return arr[0] * 8 + arr[1];
+		return x * 8 + y;
 	}
 
 	/**
