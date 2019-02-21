@@ -1,3 +1,5 @@
+package model;
+
 import java.util.*;
 import java.lang.*;
 
@@ -10,7 +12,7 @@ import java.lang.*;
 public class Board {
 
 	Piece[] board;
-	public int robotPosition;
+	public int position;
 	public static int BOARDSIZE = 8;
 
 	/* Piece types */
@@ -31,8 +33,8 @@ public class Board {
 		for (int i = 0; i < 64; i++) {
 			board[i] = Piece.EMPTY;
 		}
-		robotPosition = pos;
-		board[robotPosition] = Piece.ROBOT;
+		position = pos;
+		board[position] = Piece.ROBOT;
 	}
 
 	/** 
@@ -176,10 +178,10 @@ public class Board {
 		} else if (heading == 3) {
 			movement = -1;
 		}
-		if (isAdjacent(robotPosition, robotPosition + movement)) {
-			board[robotPosition] = Piece.EMPTY;
-			robotPosition += movement;
-			board[robotPosition] = Piece.ROBOT;
+		if (isAdjacent(position, position + movement)) {
+			board[position] = Piece.EMPTY;
+			position += movement;
+			board[position] = Piece.ROBOT;
 		} else {
 			throw new IllegalArgumentException("This movement would cause the robot to hit a wall");
 		}
@@ -233,6 +235,22 @@ public class Board {
 		return false;
 	}
 
+	public static boolean isNWSE(int tile1, int tile2) {
+		if (tile1 == tile2) {
+			return false;
+		} else if (tile1 > 63 || tile2 > 63 ) {
+			return false;
+		} else if  (tile1 < 0 || tile2 < 0) {
+			return false;
+		} else {
+			return (tile1 % BOARDSIZE == tile2 % BOARDSIZE - 1 && isSame(tile1, tile2)) ||
+					(tile1 % BOARDSIZE == tile2 % BOARDSIZE + 1 && isSame(tile1, tile2)) ||
+					(tile1 % BOARDSIZE == tile2 && isBelow(tile1, tile2))||
+					(tile1 % BOARDSIZE == tile2 && isAbove(tile1, tile2));
+		}
+
+	}
+
 	/**
 	* Returns if the string positions TILE1 and TILE2 are 2 pieces away from
 	* each other on the board.
@@ -252,14 +270,24 @@ public class Board {
 			return false;
 		} else if  (tile1 < 0 || tile2 < 0) {
 			return false;
-		} else if ((tile1 % BOARDSIZE == tile2 % BOARDSIZE - 2) ||
+		} else if ((tile1 % BOARDSIZE == tile2 % BOARDSIZE + 2) ||
 			(tile1 % BOARDSIZE == tile2 % BOARDSIZE) ||
 			(tile1 % BOARDSIZE == tile2 % BOARDSIZE - 2)) {
 			if (isAbove2(tile1,tile2) || isSame(tile1, tile2) || isBelow2(tile1,tile2)) {
-				return true; /* is Two above, two below, or on the same line, and two
-								to the left, two to the right or the the same row.
-								Note: Dealt with edge case tile1 = tile2 */
+				return true;
 			}
+				/*top left, top middle, top right, middle left, middle right, bottom left, bottom right, bottom middle
+				 * 8/16 cases */
+		} else if ((tile1 % BOARDSIZE == tile2 % BOARDSIZE - 1) ||
+				(tile1 % BOARDSIZE == tile2 % BOARDSIZE + 1)) {
+			return (isAbove2(tile1,tile2) || isBelow2(tile1,tile2));
+				/*top middle-left, top middle-right, bottom middle-left, bottom middle-right
+				 * 4/16 cases */
+		}
+
+		if ((tile1 % BOARDSIZE == tile2 % BOARDSIZE + 2) || (tile1 % BOARDSIZE == tile2 % BOARDSIZE - 2)) {
+			return isAbove(tile1, tile2) || isBelow(tile1, tile2);
+				/*other 4 cases */
 		}
 		return false;
 	}
@@ -358,7 +386,7 @@ public class Board {
 	* Returns the ROBOTPOSITION on the board.
 	*/
 	public int getRobotPosition() {
-		return robotPosition;
+		return position;
 	}
 
 	/** 
@@ -389,6 +417,12 @@ public class Board {
 		}
 	}
 
+	/**
+	 *
+	 * @param tile is a tile on the board (0<=tile<=63)
+	 * @return the valid directions that the robot could go
+	 * given a spot on the board.
+	 */
 	public static int[] validHeadings(int tile) {
 		ArrayList<Integer> valid = new ArrayList<Integer>();
 		if (isAdjacent(tile, tile + 8)) {
@@ -413,6 +447,9 @@ public class Board {
 		return arr;
 	}
 
+	/**
+	 * Returns true if ARR contains the value TARGETVALUE
+	 */
 	public static boolean contains(int[] arr, int targetValue) {
 	    for (int s: arr) {
 	        if (s == targetValue) {
@@ -422,8 +459,120 @@ public class Board {
 	    return false;
 	}
 
+	/**
+	 *
+	 * @return BOARDSIZE
+	 */
     public int getBoardSize() {
     	return BOARDSIZE;
     }
 
-}
+	/**
+	 * Returns the location of MYROBOT in an X,Y pair. X being the row
+	 * Y being the column
+	 */
+	public int[] getXY(robot myRobot) {
+		int[] result = new int[3];
+		int currentPosition = this.getRobotPosition();
+		int X = position % 8;
+		int Y = position / 8;
+		int H = myRobot.heading;
+		result[0] = Y;
+		result[1] = X;
+		result[2] = H;
+		return result;
+	}
+
+	/**
+	 * Translates the direction (heading) from the Board heading to the
+	 * given Interface GUI heading. West and East remain the same, but North => South
+	 * and South => North in from our model to the given GUI model.
+	 */
+	public int translateDirection(int direction) {
+		if (direction == 0) {
+			return 2;
+		} else if (direction == 2) {
+			return 0;
+		} else {
+			return direction;
+		}
+	}
+
+	public static int[] removeCurrentDirection(int[] headings, int heading) {
+		if (contains(headings, heading)) {
+			int[] newHeadings = new int[headings.length - 1];
+			int i = 0;
+			for (int head: headings) {
+				if (head != heading) {
+					newHeadings[i] = head;
+					i++;
+				}
+			}
+			return newHeadings;
+		} else {
+			return headings;
+		}
+	}
+
+	public static double GioTest(int position) {
+		int nLn1 = 0;
+		int nLn2 = 0;
+		int size = 8;
+		int[] possibleLn2s = {
+				size*2 - 2, size*2 - 1, size *2, size*2 + 1, size * 2 + 2,
+				size - 2, size + 2,
+				-2, 2,
+				size*-1 - 2, size*-1 + 2,
+				size*-2 - 2, size*-2 - 1, size*-2, size*-2 + 1, size*-2 + 2};
+		int[] possibleLn1s = {size - 1, size, size + 1,
+				-1, 1,
+				size*-1 - 1, size*-1, size*-1 + +1 };
+		for (int possibleLn2: possibleLn2s) {
+			if (Board.isAdjacent2(position, position + possibleLn2)) {
+				nLn2 += 1;
+			}
+		}
+		for (int possibleLn1: possibleLn1s) {
+			if (Board.isAdjacent(position, position + possibleLn1)) {
+				nLn1 += 1;
+			}
+		}
+		double chanceOfNothing = 1000 - 100 - nLn1* 50 - nLn2*25;
+		return chanceOfNothing;
+	}
+
+	public static double[] normalize(double[] arr, double normalizer) {
+		for (int i = 0; i < arr.length; i++) {
+			arr[i] = arr[i] / normalizer;
+		}
+		return arr;
+	}
+
+	public static double[][] multiplicar(double[][] A, double[][] B) {
+
+		int aRows = A.length;
+		int aColumns = A[0].length;
+		int bRows = B.length;
+		int bColumns = B[0].length;
+
+		if (aColumns != bRows) {
+			throw new IllegalArgumentException("A:Rows: " + aColumns + " did not match B:Columns " + bRows + ".");
+		}
+
+		double[][] C = new double[aRows][bColumns];
+		for (int i = 0; i < aRows; i++) {
+			for (int j = 0; j < bColumns; j++) {
+				C[i][j] = 0.00000;
+			}
+		}
+
+		for (int i = 0; i < aRows; i++) { // aRow
+			for (int j = 0; j < bColumns; j++) { // bColumn
+				for (int k = 0; k < aColumns; k++) { // aColumn
+					C[i][j] += A[i][k] * B[k][j];
+				}
+			}
+		}
+		return C;
+}	}
+

@@ -1,3 +1,4 @@
+package model;
 import java.util.*;
 
 class Sensor {
@@ -41,14 +42,13 @@ class Sensor {
 		}
 		int thresholdLn1 = 100 + nLn1*50;
 		int thresholdLn2 = 100 + nLn1*50 + nLn2*25;
-		if (rand >= 100 && rand < thresholdLn1) {
+		if (rand < thresholdLn1) { //pick randomLn1
 			int randompick = rnd.nextInt(valid1.size());
-			return valid1.get(randompick).intValue();
-			//pick randomLn1
-		} else if (rand >= thresholdLn1 && rand < thresholdLn2) {
+			return valid1.get(randompick);
+
+		} else if (rand >= thresholdLn1 && rand < thresholdLn2) { //pick randomLn2
 			int randompick = rnd.nextInt(valid2.size());
-			return valid2.get(randompick).intValue();
-			//pick randomLn2
+			return valid2.get(randompick);
 		} else {
 			return -1;
 		}
@@ -56,5 +56,17 @@ class Sensor {
 
 
 
+	}
+
+	public int[] scanTranslate(int scanPos) {
+		if (scanPos == -1) {
+			return null;
+		}
+		int[] result = new int[2];
+		int X = scanPos % 8;
+		int Y = scanPos / 8;
+		result[0] = X;
+		result[1] = Y;
+		return result;
 	}
 }
