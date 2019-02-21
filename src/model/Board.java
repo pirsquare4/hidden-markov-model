@@ -235,6 +235,22 @@ public class Board {
 		return false;
 	}
 
+	public static boolean isNWSE(int tile1, int tile2) {
+		if (tile1 == tile2) {
+			return false;
+		} else if (tile1 > 63 || tile2 > 63 ) {
+			return false;
+		} else if  (tile1 < 0 || tile2 < 0) {
+			return false;
+		} else {
+			return (tile1 % BOARDSIZE == tile2 % BOARDSIZE - 1 && isSame(tile1, tile2)) ||
+					(tile1 % BOARDSIZE == tile2 % BOARDSIZE + 1 && isSame(tile1, tile2)) ||
+					(tile1 % BOARDSIZE == tile2 && isBelow(tile1, tile2))||
+					(tile1 % BOARDSIZE == tile2 && isAbove(tile1, tile2));
+		}
+
+	}
+
 	/**
 	* Returns if the string positions TILE1 and TILE2 are 2 pieces away from
 	* each other on the board.
@@ -521,9 +537,42 @@ public class Board {
 				nLn1 += 1;
 			}
 		}
-		System.out.print("nLn2 is: ");
-		System.out.println(nLn2);
 		double chanceOfNothing = 1000 - 100 - nLn1* 50 - nLn2*25;
 		return chanceOfNothing;
 	}
-}
+
+	public static double[] normalize(double[] arr, double normalizer) {
+		for (int i = 0; i < arr.length; i++) {
+			arr[i] = arr[i] / normalizer;
+		}
+		return arr;
+	}
+
+	public static double[][] multiplicar(double[][] A, double[][] B) {
+
+		int aRows = A.length;
+		int aColumns = A[0].length;
+		int bRows = B.length;
+		int bColumns = B[0].length;
+
+		if (aColumns != bRows) {
+			throw new IllegalArgumentException("A:Rows: " + aColumns + " did not match B:Columns " + bRows + ".");
+		}
+
+		double[][] C = new double[aRows][bColumns];
+		for (int i = 0; i < aRows; i++) {
+			for (int j = 0; j < bColumns; j++) {
+				C[i][j] = 0.00000;
+			}
+		}
+
+		for (int i = 0; i < aRows; i++) { // aRow
+			for (int j = 0; j < bColumns; j++) { // bColumn
+				for (int k = 0; k < aColumns; k++) { // aColumn
+					C[i][j] += A[i][k] * B[k][j];
+				}
+			}
+		}
+		return C;
+}	}
+
