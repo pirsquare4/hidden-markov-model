@@ -1,13 +1,28 @@
 package model;
 import java.util.*;
 
+/**
+ * This class is a sensor that calculates the
+ * probability of a location containing the robot.
+ * @author: Giordano Bonora Groome & Ben Chu
+ */
 class Sensor {
+	/**
+	 * A Random object.
+	 */
 	public Random rnd;
 
+	/**
+	 * The given sensor that utilizes the random object.
+	 */
 	public Sensor() {
 		rnd = new Random();
 	}
 
+	/**
+	 * This function scans the board and evaluates the
+	 * probabilities of a robot being at the given location.
+	 */
 	public int scan(Board board) {
 		int robotPosition = board.getRobotPosition();
 		int rand = rnd.nextInt(1000);
@@ -52,12 +67,12 @@ class Sensor {
 		} else {
 			return -1;
 		}
-
-
-
-
 	}
 
+	/**
+	 * This helper function translates the scanned position
+	 * into x/y coordinates and places it into an array.
+	 */
 	public int[] scanTranslate(int scanPos) {
 		if (scanPos == -1) {
 			return null;
