@@ -60,8 +60,6 @@ public class robot {
         }
 
         position += step_in_heading(heading);
-        System.out.println(position);
-        System.out.println(heading);
         return heading;
 
     }

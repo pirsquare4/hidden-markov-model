@@ -311,8 +311,6 @@ public class RobotLocalizationViewer {
 		viewer.repaint();
 		
 	}
-
-
 	
 
 }

@@ -235,6 +235,10 @@ public class Board {
 		return false;
 	}
 
+	/**
+	 * Returns true if TILE1 is directly one tile North, West, South or East away from TILE2.\
+	 * else false
+	 */
 	public static boolean isNWSE(int tile1, int tile2) {
 		return isAdjacent(tile1, tile2) && (
 				(tile1 % BOARDSIZE == tile2 % BOARDSIZE - 1 && isSame(tile1, tile2)) ||
@@ -396,6 +400,10 @@ public class Board {
 		board[getIndex(position)] = piece;
 	}
 
+	/**
+	 * Returns true if given the current HEADING and position TILE, the next
+	 * turn would result in the robot crashing into the wall.
+	 */
 	public static boolean willHitWall(int heading, int tile) {
 		return !isAdjacent(tile, DummyLocalizer.getMovement(heading) + tile);
 	}
@@ -466,6 +474,9 @@ public class Board {
 		return result;
 	}
 
+	/**
+	 * Converts an X,Y pair to the appropriate int which represents its numerical position on the board
+	 */
 	public static int XYtoInt(int x, int y) {
 		return x * 8 + y;
 	}
@@ -485,6 +496,9 @@ public class Board {
 		}
 	}
 
+	/**
+	 * removes HEADING from the HEADINGS array and returns it. Not destructive.
+	 */
 	public static int[] removeCurrentDirection(int[] headings, int heading) {
 		if (contains(headings, heading)) {
 			int[] newHeadings = new int[headings.length - 1];
@@ -501,7 +515,10 @@ public class Board {
 		}
 	}
 
-	public static double GioTest(int position) {
+	/**
+	 * Returns the probability that robot is a position POSITION given a "nothing" reading
+	 */
+	public static double getEmptyProbabilities(int position) {
 		int nLn1 = 0;
 		int nLn2 = 0;
 		int size = 8;
@@ -528,13 +545,9 @@ public class Board {
 		return chanceOfNothing;
 	}
 
-	public static double[] normalize(double[] arr, double normalizer) {
-		for (int i = 0; i < arr.length; i++) {
-			arr[i] = arr[i] / normalizer;
-		}
-		return arr;
-	}
-
+	/**
+	 * Multiplies two matrices if possible, else returns an error.
+	 */
 	public static double[][] multiplicar(double[][] A, double[][] B) {
 
 		int aRows = A.length;
