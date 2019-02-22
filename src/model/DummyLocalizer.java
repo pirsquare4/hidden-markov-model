@@ -1,10 +1,13 @@
 package model;
 
 import control.EstimatorInterface;
-import java.util.*;
-import java.util.stream.*;
 
-
+/**
+ * Looks stupid, but is smart ;)
+ * This "Dummy Localizer" tracks the robot and reports our best estimate
+ * for where the robot actually is on the board.
+ * @author: Giordano Bonora Groome & Ben Chu
+ */
 public class DummyLocalizer implements EstimatorInterface {
 		
 	private int rows, cols, head;
@@ -15,9 +18,13 @@ public class DummyLocalizer implements EstimatorInterface {
 	public double[][] transitionMatrix;
 	public double[][] allObservationMatrixes;
 	private double[] emptyUpdate;
-	private double normalizer;
 	private double[][] f;
+	private int manSum;
+	private int numRounds;
 
+	/**
+	 * Localizer constructor for a ROWS*COLS board, with HEAD different headings
+	 */
 	public DummyLocalizer( int rows, int cols, int head) {
 		this.rows = rows;
 		this.cols = cols;
@@ -26,11 +33,15 @@ public class DummyLocalizer implements EstimatorInterface {
 		board = new Board(myRobot.position);
 		sensor = new Sensor();
 		currentScan = sensor.scan(board);
-		this.transitionMatrix = new double[this.rows*this.cols*4][this.rows*this.cols*4];
+		this.transitionMatrix = new double[this.rows * this.cols * 4][this.rows * this.cols * 4];
 		this.transitionMatrix = createTransition();
-		this.allObservationMatrixes = createObsMatrixes();
-		f = new double[1][this.rows*this.cols*this.head];
-		Arrays.fill(f[0], 1.0/this.rows*this.cols*this.head);
+		this.allObservationMatrixes = createObsMatrix();
+		f = new double[this.rows * this.cols * this.head][1];
+		for (int i = 0; i < f.length; i++) {
+			f[i][0] = 1.0 / (this.rows * this.cols * this.head);
+		}
+		manSum = 0;
+		numRounds = 0;
 	}
 	
 	public int getNumRows() {
@@ -44,13 +55,28 @@ public class DummyLocalizer implements EstimatorInterface {
 	public int getNumHead() {
 		return head;
 	}
-	
+
+	/**
+	 * returns the probability entry (Tij) of the transition matrix T to go from pose
+	 * 	 * i = (x, y, h) to pose j = (nX, nY, nH)
+	 */
 	public double getTProb( int x, int y, int h, int nX, int nY, int nH) {
-		return 0.0;
+		int i = (x*getNumRows() + y) * getNumHead() + board.translateDirection(h);
+		int j = (nX * getNumRows() + nY) * getNumHead() + board.translateDirection(nH);
+		return transitionMatrix[i][j];
 	}
 
+	/*
+	 * returns the probability entry of the sensor matrices O to get reading r corresponding
+	 * to position (rX, rY) when actually in position (x, y) (note that you have to take
+	 * care of potentially necessary transformations from states i = <x, y, h> to
+	 * positions (x, y)).
+	 */
 	public double getOrXY( int rX, int rY, int x, int y, int h) {
-		return 0.1;
+		if (rX == -1 && rY == -1) {
+			return allObservationMatrixes[64][x*getNumRows() + y];
+		}
+		return allObservationMatrixes[rX*getNumRows() + rY][x*getNumRows() + y];
 	}
 
 
@@ -60,6 +86,10 @@ public class DummyLocalizer implements EstimatorInterface {
 		return ret;
 	}
 
+	/**
+	 * Returns the current sensor reading if there is one, translated from an int to an x y pair
+	 * and null if there is no reading.
+	 */
 	public int[] getCurrentReading() {
 		if (currentScan == -1) {
 			return null;
@@ -71,37 +101,66 @@ public class DummyLocalizer implements EstimatorInterface {
 		result[1] = X;
 		return result;
 	}
-
-
+	/**
+	 * Returns the probability of the robot being at row x, col y on the board
+	 * given the sensor readings and the HMM.
+	 */
 	public double getCurrentProb( int x, int y) {
-		int IntForm = (Board.XYtoInt(x, y));
+		int IntForm = (Board.XYtoInt(x, y))*4;
 		double sum = 0;
 		for (int i = 0; i < getNumHead(); i++) {
-			sum += f[0][IntForm + i];
+			sum += f[IntForm + i][0];
 		}
 		return sum;
 	}
 
+	/**
+	 * Updates f with the information given from the new scan
+	 * f_t+1 = O[i]*tranpose(T)*f_t (uses forward filtering)
+	 */
 	public void update() {
 		int new_heading = myRobot.move_robot();
 		board.move(new_heading);
 		currentScan = sensor.scan(board);
 		int[] XYScan = sensor.scanTranslate(currentScan);
+		int[] XYTrue = sensor.scanTranslate(board.getRobotPosition());
 		if (XYScan == null) {
 			f = Board.multiplicar(Board.multiplicar(vectorToMatrix4(allObservationMatrixes[64]), transpose(transitionMatrix)), f);
 		} else {
 			f = Board.multiplicar(Board.multiplicar(vectorToMatrix4(allObservationMatrixes[currentScan]), transpose(transitionMatrix)), f);
 		}
 		double sum = 0;
-		for (int i = 0; i < f[0].length; i++) {
-			sum += f[0][i];
+		for (int i = 0; i < f.length; i++) {
+			sum += f[i][0];
 		}
-		for (int i = 0; i < f[0].length; i++) {
-			f[0][i] = f[0][i]/sum;
+		for (int i = 0; i < f.length; i++) {
+			f[i][0] = f[i][0]/sum;
 		}
 
+		sum = 0;
+		for (int i = 0; i < f.length; i++) {
+			sum += f[i][0];
+		}
+		double[] allNums = new double[cols*rows];
+		for (int i = 0; i < rows*cols; i++) {
+			allNums[i] = getCurrentProb(i/getNumRows(), i%getNumCols());
+		}
+		int largest = getIndexOfLargest(allNums);
+
+		manSum +=  (Math.abs(largest/getNumRows() - XYTrue[1]) + Math.abs(largest%getNumCols() - XYTrue[0]));
+		numRounds++;
+		System.out.println((double) manSum/numRounds); //Prints out Manhattan Distance
 	}
 
+	/**
+	 * Returns a vector.length*vector.length*4 by vector.length*vector.length*4 matrix
+	 * which for each row i in vector, puts i on the diagonal 4 times repeated
+	 * vectorToMatrix4([2]) =
+	 * 		  [[2,0,0,0]
+	 * 		   [0,2,0,0]
+	 * 		   [0,0,2,0]
+	 * 		   [0,0,0,2]]
+	 */
 	public static double[][] vectorToMatrix4(double[] vector) {
 		int len = vector.length;
 		double[][] matrix = new double[len*4][len*4];
@@ -119,23 +178,9 @@ public class DummyLocalizer implements EstimatorInterface {
 		return matrix;
 	}
 
-	public static double[][] normalizeNested(double[][] arr) {
-		double sum = 0.0;
-		for (int i = 0; i < arr.length; i++) {
-			for (int j = 0; j < arr[0].length; j++) {
-				sum += arr[i][j];
-			}
-		}
-		for (int i = 0; i < arr.length; i++) {
-			for(int j = 0; j < arr.length; j++) {
-				arr[i][j] = arr[i][j] / sum;
-			}
-		}
-		System.out.print("SUM IS: ");
-		System.out.println(sum);
-		return arr;
-	}
-
+	/**
+	 * Creates the transition matrix T, where T(i,j) represents the probability of going from state i to state j
+	 */
 	public double[][] createTransition() {
 		double[][] transition = new double[this.getNumRows()*this.getNumCols()*this.getNumHead()][this.getNumRows()*this.getNumCols()*this.getNumHead()];
 		for (int i = 0; i < transition.length; i++) {
@@ -146,6 +191,11 @@ public class DummyLocalizer implements EstimatorInterface {
 		return transition;
 	}
 
+	/**
+	 * Returns the probability of going from state i to state j in the transition matrix
+	 * where i/4 = x_pos, i%4 = x_heading
+	 * and where j/4 = y_pos, y%4 = y_heading
+	 */
 	public double probability(int i, int j) {
 		//FROM B TO A
 		int posA = i/4;
@@ -196,6 +246,9 @@ public class DummyLocalizer implements EstimatorInterface {
 		}
 	}
 
+	/**
+	 * Converts the heading to the equivalent movement on the board
+	 */
 	public static int getMovement(int heading) {
 		if (heading == 0) {
 			return 8;
@@ -210,21 +263,31 @@ public class DummyLocalizer implements EstimatorInterface {
 		}
 	}
 
-	public double[][] createObsMatrixes() {
+	/**
+	 * Creates an observation Matrix (rows*cols + 1 by rows*cols) for the given board.
+	 * for vector i, from 1 to len - 1 , vector i represents the observation vector for the
+	 * given i. The last vector (Vector rows*col + 1) is the observation vector for "nothing"
+	 * observation.
+	 */
+	public double[][] createObsMatrix() {
 		double[][] result = new double[getNumCols()*getNumRows() + 1][getNumCols()*getNumRows()];
-		emptyUpdate = new double[64];
-		for (int i = 0; i < 64; i++) {
-			double newVal = Board.GioTest(i);
+		emptyUpdate = new double[getNumRows()*getNumCols()];
+		for (int i = 0; i < emptyUpdate.length ; i++) {
+			double newVal = Board.getEmptyProbabilities(i);
 			emptyUpdate[i] = newVal;
 		}
 		for (int i = 0; i < getNumRows()*getNumCols(); i++) {
-			result[i] = createObsMatrix(i);
+			result[i] = createObsVector(i);
 		}
 		result[getNumCols()*getNumRows()] = emptyUpdate;
 		return result;
 	}
 
-	public double[] createObsMatrix(int pos) {
+	/**
+	 * Creates an singular observation vector for the given observation
+	 * at position POS.
+	 */
+	public double[] createObsVector(int pos) {
 		double[] result = new double[getNumCols()*getNumRows()];
 		for (int i = 0; i < result.length; i++) {
 			result[i] = 0;
@@ -243,6 +306,9 @@ public class DummyLocalizer implements EstimatorInterface {
 		return result;
 	}
 
+	/**
+	 * Transposes the matrix ARRAY.
+	 */
 	public double[][] transpose (double[][] array) {
 		if (array == null || array.length == 0)//empty or unset array, nothing do to here
 			return array;
@@ -258,6 +324,21 @@ public class DummyLocalizer implements EstimatorInterface {
 			}
 		}
 		return array_new;
+	}
+
+	/**
+	 * returns the index with the largest number
+	 */
+	public int getIndexOfLargest( double[] array )
+	{
+		if ( array == null || array.length == 0 ) return -1; // null or empty
+
+		int largest = 0;
+		for ( int i = 1; i < array.length; i++ )
+		{
+			if ( array[i] > array[largest] ) largest = i;
+		}
+		return largest; // position of the first largest found
 	}
 
 
