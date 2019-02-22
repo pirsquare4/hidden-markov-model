@@ -16,7 +16,7 @@ public class DummyLocalizer implements EstimatorInterface {
 	public double[][] allObservationMatrixes;
 	private double[] emptyUpdate;
 	private double normalizer;
-	private double[] f;
+	private double[][] f;
 
 	public DummyLocalizer( int rows, int cols, int head) {
 		this.rows = rows;
@@ -29,12 +29,9 @@ public class DummyLocalizer implements EstimatorInterface {
 		this.transitionMatrix = new double[this.rows*this.cols*4][this.rows*this.cols*4];
 		this.transitionMatrix = createTransition();
 		this.allObservationMatrixes = createObsMatrixes();
-		normalizer = 0;
-		for (int i = 0; i < transitionMatrix.length; i++) {
-			for (int j = 0; j < transitionMatrix[0].length; j++) {
-				normalizer += transitionMatrix[i][j];
-			}
-		}
+		for (int i =0; i < transitionMatrix.length;)
+		f = new double[1][this.rows*this.cols*this.head];
+		Arrays.fill(f[0], 1.0/this.rows*this.cols*this.head);
 	}
 	
 	public int getNumRows() {
@@ -78,15 +75,12 @@ public class DummyLocalizer implements EstimatorInterface {
 
 
 	public double getCurrentProb( int x, int y) {
-		int IntForm = (Board.XYtoInt(x, y))*4;
+		int IntForm = (Board.XYtoInt(x, y));
 		double sum = 0;
-		for (int i = 0; i < transitionMatrix[0].length; i++) {
-			for (int j = 0; j < getNumHead(); j++) {
-				sum += transitionMatrix[i][IntForm + j];
-			}
+		for (int i = 0; i < getNumHead(); i++) {
+			sum += f[0][IntForm + i];
 		}
-		System.out.println("Sum is");
-		return sum/this.normalizer;
+		return sum;
 	}
 
 	public void update() {
@@ -95,16 +89,16 @@ public class DummyLocalizer implements EstimatorInterface {
 		currentScan = sensor.scan(board);
 		int[] XYScan = sensor.scanTranslate(currentScan);
 		if (XYScan == null) {
-			this.transitionMatrix = Board.multiplicar(this.transitionMatrix, vectorToMatrix4(allObservationMatrixes[64]));
+			f = Board.multiplicar(Board.multiplicar(vectorToMatrix4(allObservationMatrixes[64]), transpose(transitionMatrix)), f);
 		} else {
-			this.transitionMatrix = Board.multiplicar(this.transitionMatrix, vectorToMatrix4(allObservationMatrixes[currentScan]));
+			f = Board.multiplicar(Board.multiplicar(vectorToMatrix4(allObservationMatrixes[currentScan]), transpose(transitionMatrix)), f);
 		}
-		//this.transitionMatrix = normalizeNested(this.transitionMatrix);
-		normalizer = 0;
-		for (int i = 0; i < transitionMatrix.length; i++) {
-			for (int j = 0; j < transitionMatrix[0].length; j++) {
-				normalizer += transitionMatrix[i][j];
-			}
+		double sum = 0;
+		for (int i = 0; i < f[0].length; i++) {
+			sum += f[0][i];
+		}
+		for (int i = 0; i < f[0].length; i++) {
+			f[0][i] = f[0][i]/sum;
 		}
 
 	}
@@ -147,7 +141,11 @@ public class DummyLocalizer implements EstimatorInterface {
 		double[][] transition = new double[this.getNumRows()*this.getNumCols()*this.getNumHead()][this.getNumRows()*this.getNumCols()*this.getNumHead()];
 		for (int i = 0; i < transition.length; i++) {
 			for (int j = 0; j < transition[0].length; j++) {
+<<<<<<< HEAD
 				transition[i][j] = this.probability(i,j); //PROB OF GOING FROM COL J TO ROW I
+=======
+				transition[i][j] = this.probability(j,i);//PROB OF GOING FROM I TO J
+>>>>>>> 8689be6bdc9b5b97c6e2b65ab140d1d228ce17cd
 			}
 		}
 		return transition;
@@ -248,6 +246,23 @@ public class DummyLocalizer implements EstimatorInterface {
 			}
 		}
 		return result;
+	}
+
+	public double[][] transpose (double[][] array) {
+		if (array == null || array.length == 0)//empty or unset array, nothing do to here
+			return array;
+
+		int width = array.length;
+		int height = array[0].length;
+
+		double[][] array_new = new double[height][width];
+
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				array_new[y][x] = array[x][y];
+			}
+		}
+		return array_new;
 	}
 
 
