@@ -84,6 +84,7 @@ public class DummyLocalizer implements EstimatorInterface {
 				sum += transitionMatrix[i][IntForm + j];
 			}
 		}
+		System.out.println("Sum is");
 		return sum/this.normalizer;
 	}
 
@@ -122,12 +123,6 @@ public class DummyLocalizer implements EstimatorInterface {
 			matrix[4*i + 3][4*i + 3] = vector[i];
 		}
 		return matrix;
-	}
-
-	public static double[] getProbs(int[] readings) {
-		double[] myarr = new double[64];
-		Arrays.fill(myarr, 1.0);
-		return myarr;
 	}
 
 	public static double[][] normalizeNested(double[][] arr) {
