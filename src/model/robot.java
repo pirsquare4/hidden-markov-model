@@ -13,6 +13,9 @@ public class robot {
     public int position;
     public int heading;
 
+    /**
+     * Robot constructor with the position and the heading.
+     */
     public robot() {
         position = ThreadLocalRandom.current().nextInt(0, 64);
         heading = ThreadLocalRandom.current().nextInt(0, 4);
@@ -22,12 +25,19 @@ public class robot {
     public Random rnd = new Random();
 
 
-    //Set the intial position and heading then print
+    /**
+     * Sets the intial position and heading then prints the information.
+     */
     public void setRandom_position_heading() {
         System.out.println("Starting Position is " + (position));
         System.out.println("Starting Heading is " + (heading));
     }
 
+    /**
+     * Takes a single step in the direction given. |8| = vertical and |1| = horizontal
+     * @param head
+     * @return integer for step
+     */
     public int step_in_heading(int head) {
         if (head == 0) {
             return 8;
@@ -40,6 +50,11 @@ public class robot {
         }
     }
 
+    /**
+     * Evaluates if the location is a corner
+     * @param position
+     * @return boolean
+     */
     public boolean isCorner(int position) {
         if (position == 0 || position == 7 || position == 56 || position == 63) {
             return true;
@@ -48,7 +63,11 @@ public class robot {
         }
     }
 
-    // Robot moves 1 round
+    /**
+     * This function moves the robot for a round. It calculates the
+     * probabilities of changing headings and takes a step.
+     * @return integer
+     */
     public int move_robot() {
         int a = rnd.nextInt(100);
         if (Board.willHitWall(heading, position) || a < 30) {
@@ -65,6 +84,4 @@ public class robot {
         return heading;
 
     }
-
-    public boolean loop = true;
 }

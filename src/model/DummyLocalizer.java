@@ -29,7 +29,6 @@ public class DummyLocalizer implements EstimatorInterface {
 		this.transitionMatrix = new double[this.rows*this.cols*4][this.rows*this.cols*4];
 		this.transitionMatrix = createTransition();
 		this.allObservationMatrixes = createObsMatrixes();
-		for (int i =0; i < transitionMatrix.length;)
 		f = new double[1][this.rows*this.cols*this.head];
 		Arrays.fill(f[0], 1.0/this.rows*this.cols*this.head);
 	}
@@ -141,11 +140,7 @@ public class DummyLocalizer implements EstimatorInterface {
 		double[][] transition = new double[this.getNumRows()*this.getNumCols()*this.getNumHead()][this.getNumRows()*this.getNumCols()*this.getNumHead()];
 		for (int i = 0; i < transition.length; i++) {
 			for (int j = 0; j < transition[0].length; j++) {
-<<<<<<< HEAD
-				transition[i][j] = this.probability(i,j); //PROB OF GOING FROM COL J TO ROW I
-=======
-				transition[i][j] = this.probability(j,i);//PROB OF GOING FROM I TO J
->>>>>>> 8689be6bdc9b5b97c6e2b65ab140d1d228ce17cd
+				transition[i][j] = this.probability(j, i);//PROB OF GOING FROM J TO I
 			}
 		}
 		return transition;
