@@ -133,7 +133,7 @@ public class DummyLocalizer implements EstimatorInterface {
 		double[][] transition = new double[this.getNumRows()*this.getNumCols()*this.getNumHead()][this.getNumRows()*this.getNumCols()*this.getNumHead()];
 		for (int i = 0; i < transition.length; i++) {
 			for (int j = 0; j < transition[0].length; j++) {
-				transition[i][j] = this.probability(i,j);//PROB OF GOING FROM COL J TO ROW I
+				transition[i][j] = this.probability(i,j); //PROB OF GOING FROM COL J TO ROW I
 			}
 		}
 		return transition;
