@@ -236,18 +236,11 @@ public class Board {
 	}
 
 	public static boolean isNWSE(int tile1, int tile2) {
-		if (tile1 == tile2) {
-			return false;
-		} else if (tile1 > 63 || tile2 > 63 ) {
-			return false;
-		} else if  (tile1 < 0 || tile2 < 0) {
-			return false;
-		} else {
-			return (tile1 % BOARDSIZE == tile2 % BOARDSIZE - 1 && isSame(tile1, tile2)) ||
-					(tile1 % BOARDSIZE == tile2 % BOARDSIZE + 1 && isSame(tile1, tile2)) ||
-					(tile1 % BOARDSIZE == tile2 && isBelow(tile1, tile2))||
-					(tile1 % BOARDSIZE == tile2 && isAbove(tile1, tile2));
-		}
+		return isAdjacent(tile1, tile2) && (
+				(tile1 % BOARDSIZE == tile2 % BOARDSIZE - 1 && isSame(tile1, tile2)) ||
+				(tile1 % BOARDSIZE == tile2 % BOARDSIZE + 1 && isSame(tile1, tile2)) ||
+				(tile1 % BOARDSIZE == tile2 % BOARDSIZE && isBelow(tile1, tile2))||
+				(tile1 % BOARDSIZE == tile2 % BOARDSIZE && isAbove(tile1, tile2)));
 
 	}
 
@@ -404,17 +397,7 @@ public class Board {
 	}
 
 	public static boolean willHitWall(int heading, int tile) {
-		if (tile % 8 == 0 && heading == 3) {
-			return true;
-		} else if (tile / 8 == 0 && heading == 2) {
-			return true;
-		} else if (tile % 8 == 7 && heading == 1) {
-			return true;
-		} else if (tile / 8 == 7 && heading == 0) {
-			return true;
-		} else {
-			return false;
-		}
+		return !isAdjacent(tile, DummyLocalizer.getMovement(heading) + tile);
 	}
 
 	/**
@@ -474,13 +457,17 @@ public class Board {
 	public int[] getXY(robot myRobot) {
 		int[] result = new int[3];
 		int currentPosition = this.getRobotPosition();
-		int X = position % 8;
-		int Y = position / 8;
+		int Y = position % 8;
+		int X = position / 8;
 		int H = myRobot.heading;
-		result[0] = Y;
-		result[1] = X;
+		result[0] = X;
+		result[1] = Y;
 		result[2] = H;
 		return result;
+	}
+
+	public static int XYtoInt(int x, int y) {
+		return x * 8 + y;
 	}
 
 	/**
@@ -537,7 +524,7 @@ public class Board {
 				nLn1 += 1;
 			}
 		}
-		double chanceOfNothing = 1000 - 100 - nLn1* 50 - nLn2*25;
+		double chanceOfNothing = 1 - 0.1 - nLn1*0.05 - nLn2*0.025;
 		return chanceOfNothing;
 	}
 

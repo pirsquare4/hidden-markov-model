@@ -2,6 +2,8 @@ package model;
 
 import control.EstimatorInterface;
 import java.util.*;
+import java.util.stream.*;
+
 
 public class DummyLocalizer implements EstimatorInterface {
 		
@@ -13,6 +15,8 @@ public class DummyLocalizer implements EstimatorInterface {
 	public double[][] transitionMatrix;
 	public double[][] allObservationMatrixes;
 	private double[] emptyUpdate;
+	private double normalizer;
+	private double[] f;
 
 	public DummyLocalizer( int rows, int cols, int head) {
 		this.rows = rows;
@@ -25,7 +29,12 @@ public class DummyLocalizer implements EstimatorInterface {
 		this.transitionMatrix = new double[this.rows*this.cols*4][this.rows*this.cols*4];
 		this.transitionMatrix = createTransition();
 		this.allObservationMatrixes = createObsMatrixes();
-
+		normalizer = 0;
+		for (int i = 0; i < transitionMatrix.length; i++) {
+			for (int j = 0; j < transitionMatrix[0].length; j++) {
+				normalizer += transitionMatrix[i][j];
+			}
+		}
 	}
 	
 	public int getNumRows() {
@@ -69,7 +78,15 @@ public class DummyLocalizer implements EstimatorInterface {
 
 
 	public double getCurrentProb( int x, int y) {
-		return this.transitionMatrix[x][y] + this.transitionMatrix[x][y+1] + this.transitionMatrix[x][y+2] + this.transitionMatrix[x][y+3];
+		int IntForm = (Board.XYtoInt(x, y))*4;
+		double sum = 0;
+		for (int i = 0; i < transitionMatrix[0].length; i++) {
+			for (int j = 0; j < getNumHead(); j++) {
+				sum += transitionMatrix[i][IntForm + j];
+			}
+		}
+		System.out.println("Sum is");
+		return sum/this.normalizer;
 	}
 
 	public void update() {
@@ -78,13 +95,16 @@ public class DummyLocalizer implements EstimatorInterface {
 		currentScan = sensor.scan(board);
 		int[] XYScan = sensor.scanTranslate(currentScan);
 		if (XYScan == null) {
-			this.transitionMatrix = Board.multiplicar(this.transitionMatrix, vectorToMatrix4(emptyUpdate));
-			this.transitionMatrix = normalizeNested(this.transitionMatrix);
+			this.transitionMatrix = Board.multiplicar(this.transitionMatrix, vectorToMatrix4(allObservationMatrixes[64]));
 		} else {
-			double[] dynamicUpdate = getProbs(XYScan);
-			this.transitionMatrix = Board.multiplicar(this.transitionMatrix, vectorToMatrix4(dynamicUpdate));
-			this.transitionMatrix = normalizeNested(this.transitionMatrix);
-
+			this.transitionMatrix = Board.multiplicar(this.transitionMatrix, vectorToMatrix4(allObservationMatrixes[currentScan]));
+		}
+		//this.transitionMatrix = normalizeNested(this.transitionMatrix);
+		normalizer = 0;
+		for (int i = 0; i < transitionMatrix.length; i++) {
+			for (int j = 0; j < transitionMatrix[0].length; j++) {
+				normalizer += transitionMatrix[i][j];
+			}
 		}
 
 	}
@@ -104,12 +124,6 @@ public class DummyLocalizer implements EstimatorInterface {
 			matrix[4*i + 3][4*i + 3] = vector[i];
 		}
 		return matrix;
-	}
-
-	public static double[] getProbs(int[] readings) {
-		double[] myarr = new double[64];
-		Arrays.fill(myarr, 1.0);
-		return myarr;
 	}
 
 	public static double[][] normalizeNested(double[][] arr) {
@@ -145,10 +159,15 @@ public class DummyLocalizer implements EstimatorInterface {
 		int headA = i%4;
 		int posB = j/4;
 		int headB = j%4;
+		int[] headings = Board.validHeadings(posB);
+		int val = headings.length;
+		if (Board.contains(headings, headB)) {
+			val -= 1;
+		}
 		if (!Board.isNWSE(posB, posA)) {
 			return 0.0;
 		}
-		if (headB == headA) { //going straight currently
+		if (headB == headA) {
 			int movement = getMovement(headB);
 			if (posB + movement == posA) {
 				return 0.7;
@@ -156,19 +175,35 @@ public class DummyLocalizer implements EstimatorInterface {
 				return 0.0;
 			}
 		} else if (headA == 0 && posB + 8 == posA) {
-			return 0.1;
+			if (Board.willHitWall(headB, posB)) {
+				return 1.0/val;
+			} else {
+				return 0.3/val;
+			}
 		} else if (headA == 1 && posB + 1 == posA) {
-			return 0.1;
+			if (Board.willHitWall(headB, posB)) {
+				return 1.0/val;
+			} else {
+				return 0.3/val;
+			}
 		} else if (headA == 2 && posB - 8 == posA) {
-			return 0.1;
+			if (Board.willHitWall(headB, posB)) {
+				return 1.0/val;
+			} else {
+				return 0.3/val;
+			}
 		} else if (headA == 3 && posB - 1 == posA) {
-			return 0.1;
+			if (Board.willHitWall(headB, posB)) {
+				return 1.0/val;
+			} else {
+				return 0.3/val;
+			}
 		} else {
 			return 0.0;
 		}
 	}
 
-	public int getMovement(int heading) {
+	public static int getMovement(int heading) {
 		if (heading == 0) {
 			return 8;
 		} else if (heading == 1) {
@@ -184,17 +219,15 @@ public class DummyLocalizer implements EstimatorInterface {
 
 	public double[][] createObsMatrixes() {
 		double[][] result = new double[getNumCols()*getNumRows() + 1][getNumCols()*getNumRows()];
-		double sum = 0;
 		emptyUpdate = new double[64];
 		for (int i = 0; i < 64; i++) {
 			double newVal = Board.GioTest(i);
-			sum += newVal;
 			emptyUpdate[i] = newVal;
 		}
-		result[getNumCols()*getNumRows()] = emptyUpdate;
 		for (int i = 0; i < getNumRows()*getNumCols(); i++) {
 			result[i] = createObsMatrix(i);
 		}
+		result[getNumCols()*getNumRows()] = emptyUpdate;
 		return result;
 	}
 
@@ -203,16 +236,12 @@ public class DummyLocalizer implements EstimatorInterface {
 		for (int i = 0; i < result.length; i++) {
 			result[i] = 0;
 		}
-		result[pos] = 0.1;
-		int[] movements = {18,17,16,15,14,
-							10,9,8,7,6,
-							-2,-1,1,2
-							-10,-9,-8,-7,-6
-							-18,-17,-16,-15,-14};
-		for (int i = 0; i < movements.length; i++) {
-			if (Board.isAdjacent(pos, pos+movements[i])) {
+		for (int i = 0; i < 64; i++) {
+			if (pos == i) {
+				result[i] = 0.1;
+			} else if (Board.isAdjacent(pos, i)) {
 				result[i] = 0.05;
-			} else if (Board.isAdjacent2(pos, pos + movements[i])) {
+			} else if (Board.isAdjacent2(pos, i)) {
 				result[i] = 0.025;
 			} else {
 				result[i] = 0.0;
