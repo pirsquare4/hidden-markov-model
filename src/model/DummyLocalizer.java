@@ -16,6 +16,7 @@ public class DummyLocalizer implements EstimatorInterface {
 	public double[][] allObservationMatrixes;
 	private double[] emptyUpdate;
 	private double normalizer;
+	private double[] f;
 
 	public DummyLocalizer( int rows, int cols, int head) {
 		this.rows = rows;
