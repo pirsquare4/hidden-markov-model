@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="RobotLocalization:jar">
+    <output-path>$PROJECT_DIR$/classes/artifacts/RobotLocalization_jar</output-path>
+    <root id="archive" name="RobotLocalization.jar">
+      <element id="module-output" name="RobotLocalization" />
+    </root>
+  </artifact>
+</component>
